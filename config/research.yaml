@@ -1,0 +1,78 @@
+# Research and validation settings. Every number here is an ASSUMPTION chosen before looking at
+# results; change them deliberately and record the change in docs/research_log.md.
+
+statistics:
+  window: 40            # prior observations used for rolling mean / std (date t itself excluded)
+  min_periods: 30       # fewer valid prior observations -> no z-score -> INCONCLUSIVE
+
+signal:
+  watch_z: 2.0          # |z| at or above this = statistical ALERT (unusual under the rolling model)
+  near_expiry_days: 10  # nearer leg this close to expiry -> risk flag
+  min_volume_lots: 5    # leg volume below this -> liquidity risk flag
+  max_gap_days: 5       # calendar days since previous observation above this -> data-gap flag
+  extreme_move_pct: 3.0 # |daily move| >= this on a leg -> flag (MCX base daily price-limit slab is 3%)
+  min_carry_gap_days: 7 # implied carry not computed for expiries closer than this (division by tiny time)
+
+strategy:
+  entry_z: 2.0
+  exit_z: 0.5
+  max_hold_days: 15
+  # Fill rule for EOD data: a signal formed with the close of day t is filled on the NEXT trading
+  # day at that day's close ("next_close"; MCX closing price = weighted average of the last 30
+  # minutes) or open ("next_open"). Both legs must have traded (volume > 0) on the fill day.
+  execution: next_close
+  lots_leg_a: 1          # leg B lots = nearest integer giving equal fine-gold grams
+  tender_days: 3         # MCX staggered delivery tender period = last 3 trading days incl. expiry
+  max_participation: 0.10  # trade lots / day's traded lots above this -> capacity warning on the trade
+
+walk_forward:
+  train_days: 180       # trading days used to choose parameters
+  test_days: 60         # trading days evaluated out of sample with those parameters
+  holdout_days: 60      # final period kept untouched until all folds are done (0 = none)
+  grid:
+    entry_z: [1.5, 2.0, 2.5]
+    exit_z: [0.0, 0.5]
+    window: [20, 40, 60]
+  min_train_trades: 3   # fewer -> fall back to the default strategy parameters
+  exploratory_min_train: 30   # exploratory mode may go down to these window sizes ...
+  exploratory_min_test: 10    # ... but its results are labelled EXPLORATORY and never PASS
+
+# Acceptance protocol. Fixed BEFORE results; the same rules drive Signal Evidence and Backtesting Lab.
+validation_pass:
+  min_folds: 3
+  min_oos_trades: 10
+  min_positive_fold_share: 0.5
+  max_top3_profit_share: 0.8  # if top 3 trades make >80% of net profit, result is fragile
+  min_positive_sensitivity_share: 0.5  # share of the entry/exit grid with positive net P&L (in-sample)
+  min_better_fold_share: 0.5  # candidate must beat baseline in MORE than this share of folds
+  require_holdout_positive: true  # if a holdout exists, its net result must be > 0
+
+# Transaction costs (per leg, per side). See cost_sources for the status of every rate.
+costs:
+  brokerage_per_order_rs: 20.0  # flat per executed order ...
+  brokerage_pct_cap: 0.03       # ... or this % of the order's turnover, whichever is LOWER
+  exchange_txn_pct: 0.0021      # % of turnover, both sides
+  ctt_sell_pct: 0.01            # Commodity Transaction Tax on non-agri futures, sell side
+  stamp_duty_buy_pct: 0.002     # buy side
+  sebi_fee_per_crore_rs: 10.0
+  gst_pct: 18.0                 # on brokerage + exchange charges + SEBI fee (not on CTT or stamp duty)
+  slippage_ticks_per_side: 1.0  # per leg per side; EOD data cannot observe real slippage
+
+cost_sources:
+  brokerage_per_order_rs: {status: SECONDARY, source: "Discount-broker schedule: Rs 20 or 0.03% per executed commodity order, whichever is lower (https://v2.webnotes.in/zerodha-commodity-brokerage). Broker-specific."}
+  brokerage_pct_cap: {status: SECONDARY, source: "Same broker schedule as above."}
+  exchange_txn_pct: {status: SECONDARY, source: "MCX futures transaction fee Rs 2.10 per lakh of turnover w.e.f. 1 Oct 2024 (Upstox news; TeamLease RegTech). No 2026 revision found; MCX circular not read directly."}
+  ctt_sell_pct: {status: SECONDARY, source: "CTT 0.01% on non-agricultural commodity futures (Finance Act 2013 per broker/blog summaries). Most sources: sell side only; some say both sides - conflicting."}
+  stamp_duty_buy_pct: {status: ASSUMED, source: "Not confirmed by any source found on 2026-10-23."}
+  sebi_fee_per_crore_rs: {status: SECONDARY, source: "SEBI turnover fee, non-agri Rs 10 per crore (broker charges page)."}
+  gst_pct: {status: SECONDARY, source: "GST 18% on brokerage and exchange/SEBI charges (broker charges pages)."}
+  slippage_ticks_per_side: {status: ASSUMED, source: "No bid/ask data. Tested under several scenarios (cost_stress)."}
+
+# Re-price every out-of-sample trade under these assumptions. Trades stay fixed; only costs change.
+cost_stress:
+  scenarios:
+    - {name: "no slippage", fee_multiplier: 1.0, slippage_ticks: 0}
+    - {name: "base", fee_multiplier: 1.0, slippage_ticks: 1}
+    - {name: "3 ticks", fee_multiplier: 1.0, slippage_ticks: 3}
+    - {name: "stress", fee_multiplier: 1.5, slippage_ticks: 5}
+  must_survive: stress   # protocol criterion: net result under this scenario must stay > 0

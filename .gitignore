@@ -1,0 +1,23 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secrets and local settings
+.env
+.env.*
+.claude/settings.local.json
+
+# Streamlit runtime cache
+.streamlit/cache/
+
+# Exchange data must never be committed or redistributed
+data/raw/
+data/processed/real/
+# MCX documents: keep locally for verification, don't republish
+docs/specs/*.pdf
+
+# Regenerable artefacts
+data/processed/synthetic/
+data/sample/
+reports/

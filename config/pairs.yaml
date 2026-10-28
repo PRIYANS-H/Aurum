@@ -1,0 +1,68 @@
+# Supported comparisons. A pair is a RULE that picks two specific contracts on each date;
+# the resulting series keeps both contract IDs on every row so rolls are never hidden.
+#
+# kind:
+#   calendar  - same product, two expiries. Same purity/units/delivery => economically clean.
+#               Primary metric: annualised implied carry  ln(F_far / F_near) / years_between_expiries
+#   cross     - two products, SAME expiry month. Compared on a fine-gold-equivalent basis.
+#               Primary metric: percentage spread of B over A after normalisation.
+
+pairs:
+  GOLDM_CAL_1_2:
+    kind: calendar
+    product: GOLDM
+    near_rank: 1
+    far_rank: 2
+    rationale: >
+      Same product, two expiries: identical purity, quotation unit and delivery terms.
+      The price difference is the market's cost of carry between the two expiry dates,
+      which should track Indian short-term interest rates plus storage/financing frictions.
+  GOLD_CAL_1_2:
+    kind: calendar
+    product: GOLD
+    near_rank: 1
+    far_rank: 2
+    rationale: "As GOLDM_CAL_1_2, for the 1 kg contract."
+  GOLD_vs_GOLDM:
+    kind: cross
+    leg_a: GOLD
+    leg_b: GOLDM
+    rationale: >
+      Same stated purity (995) and quotation unit (Rs/10 g); differ in lot size and bar size.
+      Same-month contracts should trade close together; persistent gaps may reflect
+      liquidity, bar-size delivery preference or expiry-day differences.
+  GOLDM_vs_GOLDGUINEA:
+    kind: cross
+    leg_a: GOLDM
+    leg_b: GOLDGUINEA
+    rationale: >
+      Different purity (995 vs 999), quotation unit (10 g vs 8 g), delivery form (bar vs coin)
+      and expiry day within the month. Compared on fine-gold content; residual premium is
+      EXPECTED (coin fabrication, retail demand, expiry gap) and is not by itself mispricing.
+  GOLDM_vs_GOLDPETAL:
+    kind: cross
+    leg_a: GOLDM
+    leg_b: GOLDPETAL
+    rationale: "As GOLDM_vs_GOLDGUINEA; Petal is 1 g / 999 / coin, priced Ex-Mumbai."
+  GOLDM_vs_GOLDTEN:
+    kind: cross
+    leg_a: GOLDM
+    leg_b: GOLDTEN
+    rationale: >
+      Same quotation unit (Rs/10 g) and price basis (Ex-Ahmedabad); purity differs (995 vs 999).
+      This isolates the purity adjustment. Expiry differs (5th vs last calendar day of the month).
+  GOLDTEN_vs_GOLDPETAL:
+    kind: cross
+    leg_a: GOLDTEN
+    leg_b: GOLDPETAL
+    rationale: >
+      Same purity (999) and the SAME expiry rule (last calendar day), so no carry gap. Differences:
+      quotation unit (10 g vs 1 g), price basis (Ex-Ahmedabad vs Ex-Mumbai), final settlement
+      (Ahmedabad vs Mumbai spot), size. The cleanest test of a location/retail premium.
+
+settings:
+  # Contracts with this many calendar days or fewer to expiry are excluded from pair series
+  # (delivery-intent period, thin trading). Positions are force-closed before this point.
+  roll_days_before_expiry: 5
+  # Cross pairs: legs must share expiry year-month. Larger day gaps are flagged.
+  flag_expiry_gap_days: 7

@@ -1,0 +1,151 @@
+# AURUM contract specifications
+#
+# RULES FOR THIS FILE
+# - Every field that feeds a calculation carries `status` and `source`.
+#   status: VERIFIED   -> read in the official MCX contract-specification PDF named in `source`
+#           SECONDARY  -> broker / third-party page or an older copied document
+#           ASSUMED    -> our working assumption; no source confirms it
+# - MCX specifications apply to CONTRACT SERIES ("July 2026 contract onwards"), so each version's
+#   `applies_from_expiry` is compared with the CONTRACT'S EXPIRY DATE, not the trading date.
+# - Official PDFs are stored in docs/specs/ (downloaded by the user from mcxindia.com, 2026-10-23).
+
+sources:
+  mcx_gold_feb2027:
+    title: "MCX - Contract Specifications of Gold Futures (February 2027 contract onwards)"
+    file: "docs/specs/gold-february-2027-contract-onwards.pdf"
+    url: "https://www.mcxindia.com/products/bullion/gold"
+    accessed: "2026-10-23"
+  mcx_goldm_aug2026:
+    title: "MCX - Contract Specifications of Gold Mini Futures (August 2026 contract onwards)"
+    file: "docs/specs/gold-mini-august-2026-contract-onwards8a79913a-e8de-4136-9f0b-25d31dc163c4.pdf"
+    url: "https://www.mcxindia.com/products/bullion/gold"
+    accessed: "2026-10-23"
+  mcx_goldten_jul2026:
+    title: "MCX - Contract Specifications of Gold Ten (10 gram) Futures (July 2026 contract onwards)"
+    file: "docs/specs/gold-ten-july-2026-contract-onwards.pdf"
+    url: "https://www.mcxindia.com/products/bullion/gold"
+    accessed: "2026-10-23"
+  mcx_guinea_jul2026:
+    title: "MCX - Contract Specifications of Gold Guinea Futures (July 2026 contract onwards)"
+    file: "docs/specs/gold-guinea-july-2026-contract-onwards.pdf"
+    url: "https://www.mcxindia.com/products/bullion/gold"
+    accessed: "2026-10-23"
+  mcx_petal_jul2026:
+    title: "MCX - Contract Specifications of Gold Petal Futures (July 2026 contract onwards)"
+    file: "docs/specs/gold-petal-july-2026-contract-onwards.pdf"
+    url: "https://www.mcxindia.com/products/bullion/gold"
+    accessed: "2026-10-23"
+  varsity_2016:
+    title: "Zerodha Varsity - Gold (Part 1) contract table"
+    url: "https://zerodha.com/varsity/chapter/gold-part-1/"
+    accessed: "2026-10-23"
+    note: "Used only for contract series older than the official PDFs we hold."
+
+products:
+  GOLD:
+    description: "Gold (1 kg)"
+    versions:
+      # Older series (e.g. Aug/Oct/Dec 2026 expiries): PDF not held. Values identical to the
+      # Feb-2027 PDF and consistent with the bhavcopy value/volume check, but not read in a PDF.
+      - applies_from_expiry: "2000-01-01"
+        quote_unit_grams: {value: 10,   status: SECONDARY, source: varsity_2016}
+        lot_grams:        {value: 1000, status: SECONDARY, source: varsity_2016}
+        tick_rs:          {value: 1.0,  status: SECONDARY, source: varsity_2016}
+        purity_per_mille: {value: 995,  status: SECONDARY, source: varsity_2016}
+        delivery_form:    {value: "1 kg bar", status: SECONDARY, source: varsity_2016}
+        price_basis:      {value: "Ex-Ahmedabad", status: ASSUMED, source: null}
+        final_settlement: {value: "average polled Ahmedabad spot, last 3 trading days", status: ASSUMED, source: null}
+        making_charge_rs_per_lot: {value: 0, status: ASSUMED, source: null}
+      - applies_from_expiry: "2027-02-01"
+        quote_unit_grams: {value: 10,   status: VERIFIED, source: mcx_gold_feb2027}
+        lot_grams:        {value: 1000, status: VERIFIED, source: mcx_gold_feb2027}
+        tick_rs:          {value: 1.0,  status: VERIFIED, source: mcx_gold_feb2027}
+        purity_per_mille: {value: 995,  status: VERIFIED, source: mcx_gold_feb2027}
+        delivery_form:    {value: "1 kg bar", status: VERIFIED, source: mcx_gold_feb2027}
+        price_basis:      {value: "Ex-Ahmedabad", status: VERIFIED, source: mcx_gold_feb2027}
+        final_settlement: {value: "average polled Ahmedabad spot, last 3 trading days", status: VERIFIED, source: mcx_gold_feb2027}
+        making_charge_rs_per_lot: {value: 0, status: VERIFIED, source: mcx_gold_feb2027}
+  GOLDM:
+    description: "Gold Mini (100 g)"
+    versions:
+      - applies_from_expiry: "2000-01-01"
+        quote_unit_grams: {value: 10,  status: SECONDARY, source: varsity_2016}
+        lot_grams:        {value: 100, status: SECONDARY, source: varsity_2016}
+        tick_rs:          {value: 1.0, status: SECONDARY, source: varsity_2016}
+        purity_per_mille: {value: 995, status: SECONDARY, source: varsity_2016}
+        delivery_form:    {value: "100 g bar", status: SECONDARY, source: varsity_2016}
+        price_basis:      {value: "Ex-Ahmedabad", status: ASSUMED, source: null}
+        final_settlement: {value: "average polled Ahmedabad spot, last 3 trading days", status: ASSUMED, source: null}
+        making_charge_rs_per_lot: {value: 0, status: ASSUMED, source: null}
+      - applies_from_expiry: "2026-08-01"
+        quote_unit_grams: {value: 10,  status: VERIFIED, source: mcx_goldm_aug2026}
+        lot_grams:        {value: 100, status: VERIFIED, source: mcx_goldm_aug2026}
+        tick_rs:          {value: 1.0, status: VERIFIED, source: mcx_goldm_aug2026}
+        purity_per_mille: {value: 995, status: VERIFIED, source: mcx_goldm_aug2026}
+        delivery_form:    {value: "100 g bar", status: VERIFIED, source: mcx_goldm_aug2026}
+        price_basis:      {value: "Ex-Ahmedabad", status: VERIFIED, source: mcx_goldm_aug2026}
+        final_settlement: {value: "average polled Ahmedabad spot, last 3 trading days", status: VERIFIED, source: mcx_goldm_aug2026}
+        making_charge_rs_per_lot: {value: 0, status: VERIFIED, source: mcx_goldm_aug2026}
+  GOLDTEN:
+    description: "Gold Ten (10 g)"
+    versions:
+      - applies_from_expiry: "2000-01-01"   # older series: no document held
+        quote_unit_grams: {value: 10,  status: ASSUMED, source: null}
+        lot_grams:        {value: 10,  status: ASSUMED, source: null}
+        tick_rs:          {value: 1.0, status: ASSUMED, source: null}
+        purity_per_mille: {value: 999, status: ASSUMED, source: null}
+        delivery_form:    {value: "10 g bar/coin", status: ASSUMED, source: null}
+        price_basis:      {value: "Ex-Ahmedabad", status: ASSUMED, source: null}
+        final_settlement: {value: "Ahmedabad 995 spot x 999/995, polled on expiry day", status: ASSUMED, source: null}
+        making_charge_rs_per_lot: {value: 300, status: ASSUMED, source: null}
+      - applies_from_expiry: "2026-07-01"
+        quote_unit_grams: {value: 10,  status: VERIFIED, source: mcx_goldten_jul2026}
+        lot_grams:        {value: 10,  status: VERIFIED, source: mcx_goldten_jul2026}
+        tick_rs:          {value: 1.0, status: VERIFIED, source: mcx_goldten_jul2026}
+        purity_per_mille: {value: 999, status: VERIFIED, source: mcx_goldten_jul2026}
+        delivery_form:    {value: "10 g bar/coin", status: VERIFIED, source: mcx_goldten_jul2026}
+        price_basis:      {value: "Ex-Ahmedabad", status: VERIFIED, source: mcx_goldten_jul2026}
+        final_settlement: {value: "Ahmedabad 995 spot x 999/995, polled on expiry day", status: VERIFIED, source: mcx_goldten_jul2026}
+        making_charge_rs_per_lot: {value: 300, status: VERIFIED, source: mcx_goldten_jul2026}
+  GOLDGUINEA:
+    description: "Gold Guinea (8 g)"
+    versions:
+      - applies_from_expiry: "2000-01-01"   # older series: secondary source only
+        quote_unit_grams: {value: 8,   status: SECONDARY, source: varsity_2016}
+        lot_grams:        {value: 8,   status: SECONDARY, source: varsity_2016}
+        tick_rs:          {value: 1.0, status: SECONDARY, source: varsity_2016}
+        purity_per_mille: {value: 999, status: ASSUMED,   source: null}
+        delivery_form:    {value: "8 g bar/coin", status: ASSUMED, source: null}
+        price_basis:      {value: "Ex-Ahmedabad", status: ASSUMED, source: null}
+        final_settlement: {value: "Ahmedabad 995 spot x 999/995 x 8/10, polled on expiry day", status: ASSUMED, source: null}
+        making_charge_rs_per_lot: {value: 200, status: ASSUMED, source: null}
+      - applies_from_expiry: "2026-07-01"
+        quote_unit_grams: {value: 8,   status: VERIFIED, source: mcx_guinea_jul2026}
+        lot_grams:        {value: 8,   status: VERIFIED, source: mcx_guinea_jul2026}
+        tick_rs:          {value: 1.0, status: VERIFIED, source: mcx_guinea_jul2026}
+        purity_per_mille: {value: 999, status: VERIFIED, source: mcx_guinea_jul2026}
+        delivery_form:    {value: "8 g bar/coin", status: VERIFIED, source: mcx_guinea_jul2026}
+        price_basis:      {value: "Ex-Ahmedabad", status: VERIFIED, source: mcx_guinea_jul2026}
+        final_settlement: {value: "Ahmedabad 995 spot x 999/995 x 8/10, polled on expiry day", status: VERIFIED, source: mcx_guinea_jul2026}
+        making_charge_rs_per_lot: {value: 200, status: VERIFIED, source: mcx_guinea_jul2026}
+  GOLDPETAL:
+    description: "Gold Petal (1 g)"
+    versions:
+      - applies_from_expiry: "2000-01-01"   # older series: secondary source only
+        quote_unit_grams: {value: 1,   status: SECONDARY, source: varsity_2016}
+        lot_grams:        {value: 1,   status: SECONDARY, source: varsity_2016}
+        tick_rs:          {value: 1.0, status: SECONDARY, source: varsity_2016}
+        purity_per_mille: {value: 999, status: ASSUMED,   source: null}
+        delivery_form:    {value: "1 g coin", status: ASSUMED, source: null}
+        price_basis:      {value: "Ex-Mumbai", status: ASSUMED, source: null}
+        final_settlement: {value: "Mumbai 995 spot x 999/995 / 10, polled on expiry day", status: ASSUMED, source: null}
+        making_charge_rs_per_lot: {value: 100, status: ASSUMED, source: null}
+      - applies_from_expiry: "2026-07-01"
+        quote_unit_grams: {value: 1,   status: VERIFIED, source: mcx_petal_jul2026}
+        lot_grams:        {value: 1,   status: VERIFIED, source: mcx_petal_jul2026}
+        tick_rs:          {value: 1.0, status: VERIFIED, source: mcx_petal_jul2026}
+        purity_per_mille: {value: 999, status: VERIFIED, source: mcx_petal_jul2026}
+        delivery_form:    {value: "1 g coin", status: VERIFIED, source: mcx_petal_jul2026}
+        price_basis:      {value: "Ex-Mumbai", status: VERIFIED, source: mcx_petal_jul2026}
+        final_settlement: {value: "Mumbai 995 spot x 999/995 / 10, polled on expiry day", status: VERIFIED, source: mcx_petal_jul2026}
+        making_charge_rs_per_lot: {value: 100, status: VERIFIED, source: mcx_petal_jul2026}
